@@ -6,3 +6,9 @@ poetry.lock
 
 #env
 .env
+
+#pycache
+__pycache__/
+
+#ruff
+.ruff_cache
