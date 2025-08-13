@@ -1,0 +1,8 @@
+#poetry
+poetry.lock
+
+#pre-commit-config
+.pre-commit-config.yaml
+
+#env
+.env

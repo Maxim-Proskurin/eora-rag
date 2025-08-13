@@ -1,0 +1,52 @@
+# Тестовое задание на позицию Python-разработчик pre-Middle для компании EORA
+
+## EORA RAG Service
+
+Сервис для поиска и генерации ответов на вопросы по материалам компании EORA с помощью LLM (OpenAI) и Retrieval-Augmented Generation(RAG).
+
+### Возможности
+
+- Парсинг и индексация информации из списка ссылок и всего сайта eora.ru.
+- Поиск релевантных фрагментов по вопросу пользователя.
+- Генерация ответа с указанием источников (inline-ссылки).
+- Современный стек: FastAPI, Poetry, ChromaDB, OpenAI, Pydantic, Docker.
+- Автоматическое форматирование и линтинг кода (ruff, isort, pre-commit).
+
+### Быстрый страрт
+
+1. Клонируйте репозиторий:
+
+   ```bash
+   git clone https://github.com/Maxim-Proskurin/eora-rag.git
+   cd eora-rag
+
+2. Установите зависимости:
+
+   ```bash
+   poetry install
+
+3. Запустите приложение:
+
+   ```bash
+   poetry run uvicorn app.main:app --reload
+
+
+### Структура проекта
+
+- app/data.py - список Ссылок и базовый URL для парсинга.
+- app/ - Основной код сервиса (FastAPI, RAG, парсинг, индексация).
+- tests/ - Тесты
+- .pre-commit-config.yaml - автоформатирование и линтинг.
+
+### Современные практики
+
+- Poetry для управления зависимостями.
+- Pydantic BaseSettings для конфигов.
+- pre-commit(ruff, isort) для чистоты кода.
+
+### TODO(минимальный)
+
+[] Реализовать парсинг и индексацию всех источников.
+[] Интегрировать Chromadb и OpenAI.
+[] Добавить эндпоинты FastAPI.
+[] Покрыть тестами.
