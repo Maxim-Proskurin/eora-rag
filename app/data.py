@@ -1,3 +1,9 @@
+from typing import Dict, List
+from urllib.parse import urljoin
+
+import requests
+from bs4 import BeautifulSoup, Tag
+
 LINKS = [
     "https://eora.ru/cases/promyshlennaya-bezopasnost",
     "https://eora.ru/cases/lamoda-systema-segmentacii-i-poiska-po-pohozhey-odezhde",
@@ -35,3 +41,74 @@ LINKS = [
 ]
 
 BASE_URL = "https://eora.ru"
+
+def parse_links(links: List[str]) -> List[Dict]:
+    """
+    Парсит список ссылок на документы или страницы.
+    Для каждой ссылки скачивает и извлекает текст.
+    Возращает список чанков с метаданными(url, текст).
+    """
+    chunks = []
+    for url in links:
+        try:
+            resp = requests.get(url, timeout=10)
+            if resp.status_code != 200:
+                continue
+            soup = BeautifulSoup(resp.text, "html.parser")
+            main_text = " ".join([p.get_text() for p in soup.find_all("p")])
+            if main_text.strip():
+                chunks.append(
+                    {
+                        "source": url,
+                        "text": main_text.strip(),
+                        }
+                    )
+        except Exception as e:
+            print(f"Ошибка анализа {url}: {e}.")
+    return chunks
+
+def crawl_site(
+    base_url: str,
+    max_pages=500,
+) -> List[Dict]:
+    """
+    Рекурсивно парсит сайт, собирает текст со страниц.
+    Возвращает список чанков с метаданными(url, текст).
+    """
+    visited = set()
+    to_visit = [base_url]
+    data = []
+
+    for i, url in enumerate(to_visit):
+        if i >= max_pages:
+            break
+        if url in visited:
+            continue
+        try:
+            resp = requests.get(url, timeout=5)
+            if resp.status_code != 200:
+                continue
+            soup = BeautifulSoup(resp.text, "html.parser")
+            main_text = " ".join([p.get_text() for p in soup.find_all("p")])
+            if main_text.strip():
+                data.append(
+                    {
+                        "source":url,
+                        "text": main_text.strip()
+                        }
+                    )
+            for a in soup.find_all("a", href=True):
+                if not isinstance(a, Tag):
+                    continue
+                href = a.get("href", None)
+                if not isinstance(href, str):
+                    continue
+                link = urljoin(url, href)
+                if link.startswith(base_url) and link not in visited and link not in to_visit:
+                    to_visit.append(link)
+            visited.add(url)
+        except Exception as e:
+            print(f"Ошибка анализа {url}: {e}.")
+    return data
+
+
